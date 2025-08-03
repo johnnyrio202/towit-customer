@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TowIT - Uber for Towing</title>
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVG93SVQiLCJzaG9ydF9uYW1lIjoiVG93SVQiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJ0aGVtZV9jb2xvciI6IiMyNTYzZWIiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y5ZmFmYiIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlNakEwSWlCb1pXbG5hSFE5SWpJd05DSWdkbWxsZDBKdmVEMGlNQ0F3SURJNE5DQXlPRFFpSUdacGJHdzlJaU15TlRZelpXSWlQanh5WldOMElIZHBaSFJvUFNJeU1qUWlJR2hsYVdkb2REMGlNakEwSWlCbWFXeHNQU0pqZFhKeVpXNTBRMjlzYjNJaUlISnNQU0l4TWlJdlBqeDBaWGgwSUhnOUlqRTBJaUI1UFNJeE5TSWdabWxzYkQwaUkzZG9hWFJsSWlCbWIyNTBMWE5wZW1VOUlqRTJJaUJtYjI1MExYZGxhV2RvZEQwaVltOXNaQ0krVkc5M1NWUThMM1JsZUhRK1BDOXpkbWMrIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
     <meta name="theme-color" content="#2563eb">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -127,7 +126,7 @@
             color: #b91c1c;
         }
 
-        .services-screen {
+        .services-screen, .tracking-screen {
             display: none;
             height: 100vh;
             flex-direction: column;
@@ -217,12 +216,6 @@
         .price-label {
             font-size: 12px;
             color: #6b7280;
-        }
-
-        .tracking-screen {
-            display: none;
-            height: 100vh;
-            flex-direction: column;
         }
 
         .status-header {
@@ -597,15 +590,6 @@
         </div>
     </div>
 
-    <!-- PWA Install Prompt -->
-    <div id="installPrompt" class="install-prompt">
-        <div>
-            <div style="font-weight: 600;">Install TowIT</div>
-            <div style="font-size: 14px; opacity: 0.8;">Add to home screen for quick access</div>
-        </div>
-        <button class="install-btn" onclick="installApp()">Install</button>
-    </div>
-
     <script>
         let selectedService = null;
         let eta = 8;
@@ -630,7 +614,6 @@
 
         function selectService(name, icon, price) {
             selectedService = { name, icon, price };
-            // For demo, go directly to tracking
             showScreen('tracking');
         }
 
@@ -681,60 +664,10 @@
             }
         }
 
-        // PWA Install functionality
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installPrompt').classList.add('show');
-        });
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
-                    deferredPrompt = null;
-                    document.getElementById('installPrompt').classList.remove('show');
-                });
-            }
-        }
-
-        // Register service worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4geyBjb25zb2xlLmxvZygnU1cgaW5zdGFsbGVkJyk7IH0pOyBzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2FjdGl2YXRlJywgZXZlbnQgPT4geyBjb25zb2xlLmxvZygnU1cgYWN0aXZhdGVkJyk7IH0pOw==')
-                .then(registration => console.log('SW registered'))
-                .catch(error => console.log('SW registration failed'));
-        }
-
-        // Simulate location updates
-        function simulateLocationUpdate() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        console.log('Location:', position.coords.latitude, position.coords.longitude);
-                    },
-                    error => {
-                        console.log('Location error:', error.message);
-                    }
-                );
-            }
-        }
-
         // Initialize app
         window.addEventListener('load', () => {
             showScreen('home');
-            simulateLocationUpdate();
-            
-            // Show install prompt after 5 seconds if not installed
-            setTimeout(() => {
-                if (!window.matchMedia('(display-mode: standalone)').matches) {
-                    document.getElementById('installPrompt').classList.add('show');
-                }
-            }, 5000);
+            console.log('TowIT Customer App loaded successfully');
         });
     </script>
 </body>
