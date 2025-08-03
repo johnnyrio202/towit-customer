@@ -1,1 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TowIT - Uber for Towing</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVG93SVQiLCJzaG9ydF9uYW1lIjoiVG93SVQiLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJ0aGVtZV9jb2xvciI6IiMyNTYzZWIiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y5ZmFmYiIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlNakEwSWlCb1pXbG5hSFE5SWpJd05DSWdkbWxsZDBKdmVEMGlNQ0F3SURJNE5DQXlPRFFpSUdacGJHdzlJaU15TlRZelpXSWlQanh5WldOMElIZHBaSFJvUFNJeU1qUWlJR2hsYVdkb2REMGlNakEwSWlCbWFXeHNQU0pqZFhKeVpXNTBRMjlzYjNJaUlISnNQU0l4TWlJdlBqeDBaWGgwSUhnOUlqRTBJaUI1UFNJeE5TSWdabWxzYkQwaUkzZG9hWFJsSWlCbWIyNTBMWE5wZW1VOUlqRTJJaUJtYjI1MExYZGxhV2RvZEQwaVltOXNaQ0krVkc5M1NWUThMM1JsZUhRK1BDOXpkbWMrIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            overflow: hidden;
+            height: 100vh;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            padding-top: 50px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #bfdbfe;
+            font-size: 16px;
+        }
+
+        .map-area {
+            flex: 1;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .location-marker {
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        .location-icon {
+            font-size: 60px;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .location-text {
+            color: #374151;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .location-subtext {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .my-location-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            padding: 12px;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 20px;
+            color: #2563eb;
+        }
+
+        .bottom-section {
+            padding: 20px;
+        }
+
+        .request-btn {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .request-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .emergency-notice {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #b91c1c;
+        }
+
+        .services-screen {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .screen-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            padding-top: 50px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 20px;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+
+        .screen-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .services-list {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .service-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .service-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .service-icon {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+
+        .service-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .service-details p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .service-pricing {
+            text-align: right;
+        }
+
+        .service-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .tracking-screen {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .status-header {
+            padding: 20px;
+            padding-top: 50px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.searching {
+            background: #eab308;
+        }
+
+        .status-dot.assigned {
+            background: #10b981;
+        }
+
+        .status-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .tracking-map {
+            flex: 1;
+            background: #dcfce7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .truck-icon {
+            font-size: 80px;
+            color: #2563eb;
+            animation: bounce 2s infinite;
+        }
+
+        .tracking-text {
+            font-size: 16px;
+            color: #374151;
+            margin-top: 16px;
+        }
+
+        .eta-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .eta-card.show {
+            display: block;
+        }
+
+        .eta-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .eta-text {
+            margin-left: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .driver-info {
+            background: white;
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .driver-info.show {
+            display: block;
+        }
+
+        .driver-details {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .driver-avatar {
+            width: 48px;
+            height: 48px;
+            background: #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .driver-meta {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .driver-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .driver-rating {
+            display: flex;
+            align-items: center;
+            margin: 2px 0;
+        }
+
+        .star {
+            color: #eab308;
+            margin-right: 4px;
+        }
+
+        .rating-text {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .vehicle-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .call-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .arrival-info {
+            text-align: center;
+        }
+
+        .arrival-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .arrival-time {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .install-prompt.show {
+            display: flex;
+        }
+
+        .install-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Home Screen -->
+        <div id="homeScreen" class="screen">
+            <div class="header">
+                <h1>TowIT</h1>
+                <p>Reliable towing, when you need it</p>
+            </div>
+            
+            <div class="map-area">
+                <div class="location-marker">
+                    <div class="location-icon">📍</div>
+                    <div class="location-text">Your current location</div>
+                    <div class="location-subtext">Times Square, NYC</div>
+                </div>
+                <button class="my-location-btn">🎯</button>
+            </div>
+            
+            <div class="bottom-section">
+                <button class="request-btn" onclick="showScreen('services')">
+                    Request Towing Service
+                </button>
+                <div class="emergency-notice">
+                    <strong>Emergency?</strong> Call 911 first if anyone is injured
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Screen -->
+        <div id="servicesScreen" class="services-screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home')">←</button>
+                <h2 class="screen-title">Select Service Type</h2>
+            </div>
+            
+            <div class="services-list">
+                <div class="service-card" onclick="selectService('Vehicle Tow', '🚛', '$85-120')">
+                    <div class="service-info">
+                        <div class="service-icon">🚛</div>
+                        <div class="service-details">
+                            <h3>Vehicle Tow</h3>
+                            <p>Standard towing service</p>
+                        </div>
+                    </div>
+                    <div class="service-pricing">
+                        <div class="service-price">$85-120</div>
+                        <div class="price-label">Est. cost</div>
+                    </div>
+                </div>
+
+                <div class="service-card" onclick="selectService('Flatbed Tow', '🚚', '$95-140')">
+                    <div class="service-info">
+                        <div class="service-icon">🚚</div>
+                        <div class="service-details">
+                            <h3>Flatbed Tow</h3>
+                            <p>Safe transport for luxury/damaged vehicles</p>
+                        </div>
+                    </div>
+                    <div class="service-pricing">
+                        <div class="service-price">$95-140</div>
+                        <div class="price-label">Est. cost</div>
+                    </div>
+                </div>
+
+                <div class="service-card" onclick="selectService('Jump Start', '🔋', '$45-65')">
+                    <div class="service-info">
+                        <div class="service-icon">🔋</div>
+                        <div class="service-details">
+                            <h3>Jump Start</h3>
+                            <p>Battery jump start service</p>
+                        </div>
+                    </div>
+                    <div class="service-pricing">
+                        <div class="service-price">$45-65</div>
+                        <div class="price-label">Est. cost</div>
+                    </div>
+                </div>
+
+                <div class="service-card" onclick="selectService('Tire Change', '🛞', '$55-75')">
+                    <div class="service-info">
+                        <div class="service-icon">🛞</div>
+                        <div class="service-details">
+                            <h3>Tire Change</h3>
+                            <p>Flat tire replacement</p>
+                        </div>
+                    </div>
+                    <div class="service-pricing">
+                        <div class="service-price">$55-75</div>
+                        <div class="price-label">Est. cost</div>
+                    </div>
+                </div>
+
+                <div class="service-card" onclick="selectService('Winch Out', '⚓', '$75-110')">
+                    <div class="service-info">
+                        <div class="service-icon">⚓</div>
+                        <div class="service-details">
+                            <h3>Winch Out</h3>
+                            <p>Vehicle recovery from ditch/mud</p>
+                        </div>
+                    </div>
+                    <div class="service-pricing">
+                        <div class="service-price">$75-110</div>
+                        <div class="price-label">Est. cost</div>
+                    </div>
+                </div>
+
+                <div class="service-card" onclick="selectService('Lockout Service', '🔐', '$35-55')">
+                    <div class="service-info">
+                        <div class="service-icon">🔐</div>
+                        <div class="service-details">
+                            <h3>Lockout Service</h3>
+                            <p>Car lockout assistance</p>
+                        </div>
+                    </div>
+                    <div class="service-pricing">
+                        <div class="service-price">$35-55</div>
+                        <div class="price-label">Est. cost</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Screen -->
+        <div id="trackingScreen" class="tracking-screen">
+            <div class="status-header">
+                <div class="status-indicator">
+                    <div id="statusDot" class="status-dot searching"></div>
+                    <div id="statusText" class="status-text">Finding nearby drivers...</div>
+                </div>
+            </div>
+            
+            <div class="tracking-map">
+                <div class="truck-icon">🚛</div>
+                <div class="tracking-text">Live tracking</div>
+                <div id="etaCard" class="eta-card">
+                    <div class="eta-info">
+                        <span style="color: #2563eb;">⏰</span>
+                        <span id="etaText" class="eta-text">8 min away</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="driverInfo" class="driver-info">
+                <div class="driver-details">
+                    <div class="driver-avatar">MJ</div>
+                    <div class="driver-meta">
+                        <div class="driver-name">Mike Johnson</div>
+                        <div class="driver-rating">
+                            <span class="star">⭐</span>
+                            <span class="rating-text">4.9 (234 rides)</span>
+                        </div>
+                        <div class="vehicle-info">2019 Ford F-550 • License: TW-1234</div>
+                    </div>
+                    <button class="call-btn">📞</button>
+                </div>
+                
+                <div class="arrival-info">
+                    <div class="arrival-label">Driver will arrive in</div>
+                    <div id="arrivalTime" class="arrival-time">8 minutes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="installPrompt" class="install-prompt">
+        <div>
+            <div style="font-weight: 600;">Install TowIT</div>
+            <div style="font-size: 14px; opacity: 0.8;">Add to home screen for quick access</div>
+        </div>
+        <button class="install-btn" onclick="installApp()">Install</button>
+    </div>
+
+    <script>
+        let selectedService = null;
+        let eta = 8;
+        let driverAssigned = false;
+
+        function showScreen(screenName) {
+            // Hide all screens
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('servicesScreen').style.display = 'none';
+            document.getElementById('trackingScreen').style.display = 'none';
+
+            // Show selected screen
+            if (screenName === 'home') {
+                document.getElementById('homeScreen').style.display = 'flex';
+            } else if (screenName === 'services') {
+                document.getElementById('servicesScreen').style.display = 'flex';
+            } else if (screenName === 'tracking') {
+                document.getElementById('trackingScreen').style.display = 'flex';
+                startTracking();
+            }
+        }
+
+        function selectService(name, icon, price) {
+            selectedService = { name, icon, price };
+            // For demo, go directly to tracking
+            showScreen('tracking');
+        }
+
+        function startTracking() {
+            // Reset tracking state
+            eta = 8;
+            driverAssigned = false;
+            
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const etaCard = document.getElementById('etaCard');
+            const driverInfo = document.getElementById('driverInfo');
+            
+            // Initial searching state
+            statusDot.className = 'status-dot searching';
+            statusText.textContent = 'Finding nearby drivers...';
+            etaCard.classList.remove('show');
+            driverInfo.classList.remove('show');
+            
+            // Simulate driver assignment after 3 seconds
+            setTimeout(() => {
+                driverAssigned = true;
+                statusDot.className = 'status-dot assigned';
+                statusText.textContent = 'Driver assigned';
+                etaCard.classList.add('show');
+                driverInfo.classList.add('show');
+                
+                // Start ETA countdown
+                updateETA();
+            }, 3000);
+        }
+
+        function updateETA() {
+            if (!driverAssigned) return;
+            
+            const etaText = document.getElementById('etaText');
+            const arrivalTime = document.getElementById('arrivalTime');
+            
+            etaText.textContent = `${Math.round(eta)} min away`;
+            arrivalTime.textContent = `${Math.round(eta)} minutes`;
+            
+            if (eta > 1) {
+                eta -= 0.5;
+                setTimeout(updateETA, 2000);
+            } else {
+                etaText.textContent = 'Driver arriving now!';
+                arrivalTime.textContent = 'Arriving now!';
+            }
+        }
+
+        // PWA Install functionality
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').classList.add('show');
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt').classList.remove('show');
+                });
+            }
+        }
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4geyBjb25zb2xlLmxvZygnU1cgaW5zdGFsbGVkJyk7IH0pOyBzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2FjdGl2YXRlJywgZXZlbnQgPT4geyBjb25zb2xlLmxvZygnU1cgYWN0aXZhdGVkJyk7IH0pOw==')
+                .then(registration => console.log('SW registered'))
+                .catch(error => console.log('SW registration failed'));
+        }
+
+        // Simulate location updates
+        function simulateLocationUpdate() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        console.log('Location:', position.coords.latitude, position.coords.longitude);
+                    },
+                    error => {
+                        console.log('Location error:', error.message);
+                    }
+                );
+            }
+        }
+
+        // Initialize app
+        window.addEventListener('load', () => {
+            showScreen('home');
+            simulateLocationUpdate();
+            
+            // Show install prompt after 5 seconds if not installed
+            setTimeout(() => {
+                if (!window.matchMedia('(display-mode: standalone)').matches) {
+                    document.getElementById('installPrompt').classList.add('show');
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
